@@ -6,7 +6,13 @@ describe("Reading users out of the database", () => {
 
   beforeEach(done => {
     joe = new User({ name: "Joe" });
-    joe.save().then(() => done());
+    john = new User({ name: "John" });
+    jane = new User({ name: "Jane" });
+    jeff = new User({ name: "Jeff" });
+
+    Promise.all([joe.save(), john.save(), jane.save(), jeff.save()]).then(() =>
+      done()
+    );
   });
 
   it("finds all users with a name of joe", done => {
@@ -25,5 +31,18 @@ describe("Reading users out of the database", () => {
       assert(user.name === "Joe");
       done();
     });
+  });
+
+  it.only("can skip and limit the result set", done => {
+    User.find({})
+      .sort({ name: 1 }) //sort by name (asc), -1 for (desc)
+      .skip(1)
+      .limit(2)
+      .then(users => {
+        assert(users.length === 2);
+        assert(users[0].name === "John");
+        assert(users[1].name === "Jane");
+        done();
+      });
   });
 });
